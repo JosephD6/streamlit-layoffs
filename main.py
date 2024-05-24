@@ -7,6 +7,7 @@ import plotly.express as px
 def load_data(file_path):
     try:
         df = pd.read_csv(file_path)
+        st.write(df.head())  # Display the first few rows for debugging
         return df.copy()  
     except Exception as e:
         st.error(f"An error occurred: {e}")
@@ -16,7 +17,8 @@ def load_data(file_path):
 st.title('Following State Layoffs!')
 
 # Load WARN data
-warn_data_path = '/Users/joey/Desktop/Layoffs/warn_notices.csv'  # Use the file path where you uploaded your CSV
+# For Streamlit Cloud, ensure the file is in the correct location
+warn_data_path = 'warn_notices.csv'  # Ensure the CSV file is in the same directory as the app
 warn_data = load_data(warn_data_path)
 
 # State population data
@@ -30,20 +32,6 @@ population_data = {
 population_df = pd.DataFrame(population_data)
 
 # Function to process data to count layoffs by state
-def process_data(df):
-    all_states = pd.DataFrame({
-        'State': ['AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA', 'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD', 'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ', 'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC', 'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY']
-    })
-    if 'State' in df.columns:
-        state_counts = df['State'].value_counts().reset_index()
-        state_counts.columns = ['State', 'Layoff Count']
-        state_counts = all_states.merge(state_counts, on='State', how='left').fillna(0)
-        state_counts['Layoff Count'] = state_counts['Layoff Count'].astype(int)
-        return state_counts
-    else:
-        st.error("The data does not contain a 'State' column.")
-        return None
-
 def process_data(layoff_df, population_df):
     if 'State' in layoff_df.columns and 'Number of Workers' in layoff_df.columns:
         layoff_df['Number of Workers'] = pd.to_numeric(layoff_df['Number of Workers'], errors='coerce')
